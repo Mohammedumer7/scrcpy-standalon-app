@@ -1,3 +1,4 @@
+//@ts-nocheck
 export default class Util {
     private static SUFFIX: Record<number, string> = {
         0: 'B',

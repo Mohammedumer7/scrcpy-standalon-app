@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Service } from './Service';
 import { TypedEmitter } from '../../common/TypedEmitter';
 import { ChildProcessByStdio, spawn } from 'child_process';

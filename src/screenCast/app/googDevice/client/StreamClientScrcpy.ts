@@ -1,34 +1,36 @@
-import { BaseClient } from '../../client/BaseClient';
-import { ParamsStreamScrcpy } from '../../../types/ParamsStreamScrcpy';
-import { GoogMoreBox } from '../toolbox/GoogMoreBox';
-import { GoogToolBox } from '../toolbox/GoogToolBox';
-import VideoSettings from '../../VideoSettings';
-import Size from '../../Size';
-import { ControlMessage } from '../../controlMessage/ControlMessage';
-import { ClientsStats, DisplayCombinedInfo } from '../../client/StreamReceiver';
-import { CommandControlMessage } from '../../controlMessage/CommandControlMessage';
-import Util from '../../Util';
-import FilePushHandler from '../filePush/FilePushHandler';
-import DragAndPushLogger from '../DragAndPushLogger';
-import { KeyEventListener, KeyInputHandler } from '../KeyInputHandler';
-import { KeyCodeControlMessage } from '../../controlMessage/KeyCodeControlMessage';
-import { BasePlayer, PlayerClass } from '../../player/BasePlayer';
-import GoogDeviceDescriptor from '../../../types/GoogDeviceDescriptor';
-import { ConfigureScrcpy } from './ConfigureScrcpy';
-import { DeviceTracker } from './DeviceTracker';
-import { ControlCenterCommand } from '../../../common/ControlCenterCommand';
-import { html } from '../../ui/HtmlTag';
+//@ts-nocheck
+
+import { BaseClient } from "../../client/BaseClient";
+import { ParamsStreamScrcpy } from "../../../types/ParamsStreamScrcpy";
+import { GoogMoreBox } from "../toolbox/GoogMoreBox";
+import { GoogToolBox } from "../toolbox/GoogToolBox";
+import VideoSettings from "../../VideoSettings";
+import Size from "../../Size";
+import { ControlMessage } from "../../controlMessage/ControlMessage";
+import { ClientsStats, DisplayCombinedInfo } from "../../client/StreamReceiver";
+import { CommandControlMessage } from "../../controlMessage/CommandControlMessage";
+import Util from "../../Util";
+import FilePushHandler from "../filePush/FilePushHandler";
+import DragAndPushLogger from "../DragAndPushLogger";
+import { KeyEventListener, KeyInputHandler } from "../KeyInputHandler";
+import { KeyCodeControlMessage } from "../../controlMessage/KeyCodeControlMessage";
+import { BasePlayer, PlayerClass } from "../../player/BasePlayer";
+import GoogDeviceDescriptor from "../../../types/GoogDeviceDescriptor";
+import { ConfigureScrcpy } from "./ConfigureScrcpy";
+import { DeviceTracker } from "./DeviceTracker";
+import { ControlCenterCommand } from "../../../common/ControlCenterCommand";
+import { html } from "../../ui/HtmlTag";
 import {
   FeaturedInteractionHandler,
   InteractionHandlerListener,
-} from '../../interactionHandler/FeaturedInteractionHandler';
-import DeviceMessage from '../DeviceMessage';
-import { DisplayInfo } from '../../DisplayInfo';
-import { Attribute } from '../../Attribute';
-import { HostTracker } from '../../client/HostTracker';
-import { ACTION } from '../../../common/Action';
-import { StreamReceiverScrcpy } from './StreamReceiverScrcpy';
-import { ParamsDeviceTracker } from '../../../types/ParamsDeviceTracker';
+} from "../../interactionHandler/FeaturedInteractionHandler";
+import DeviceMessage from "../DeviceMessage";
+import { DisplayInfo } from "../../DisplayInfo";
+import { Attribute } from "../../Attribute";
+import { HostTracker } from "../../client/HostTracker";
+import { ACTION } from "../../../common/Action";
+import { StreamReceiverScrcpy } from "./StreamReceiverScrcpy";
+import { ParamsDeviceTracker } from "../../../types/ParamsDeviceTracker";
 type StartParams = {
   udid: string;
   playerName?: string;
@@ -39,20 +41,20 @@ type StartParams = {
   deviceName?: string;
 };
 
-const TAG = '[StreamClientScrcpy]';
+const TAG = "[StreamClientScrcpy]";
 
 export class StreamClientScrcpy
   extends BaseClient<ParamsStreamScrcpy, never>
   implements KeyEventListener, InteractionHandlerListener
 {
-  public static ACTION = 'stream';
+  public static ACTION = "stream";
   private static players: Map<string, PlayerClass> = new Map<
     string,
     PlayerClass
   >();
 
   private controlButtons?: HTMLElement;
-  private deviceName = '';
+  private deviceName = "";
   private clientId = -1;
   private clientsCount = -1;
   private joinedStream = false;
@@ -198,15 +200,15 @@ export class StreamClientScrcpy
     const typedParams = super.parseParameters(params);
     const { action } = typedParams;
     if (action !== ACTION.STREAM_SCRCPY) {
-      throw Error('Incorrect action');
+      throw Error("Incorrect action");
     }
 
     return {
       ...typedParams,
       action,
-      player: Util.parseString(params, 'player', true),
-      udid: Util.parseString(params, 'udid', true),
-      ws: Util.parseString(params, 'ws', true),
+      player: Util.parseString(params, "player", true),
+      udid: Util.parseString(params, "udid", true),
+      ws: Util.parseString(params, "ws", true),
     };
   }
 
@@ -253,7 +255,7 @@ export class StreamClientScrcpy
     }
     const { videoSettings, screenInfo } = info;
     this.player.setDisplayInfo(info.displayInfo);
-    if (typeof this.fitToScreen !== 'boolean') {
+    if (typeof this.fitToScreen !== "boolean") {
       this.fitToScreen = this.player.getFitToScreenStatus();
     }
     if (this.fitToScreen) {
@@ -311,24 +313,24 @@ export class StreamClientScrcpy
   };
 
   public onDisconnected = (udid, eventEmitter): void => {
-    console.log('DISCONNECTED DISCONNECTED', udid);
-    this.streamReceiver.off('deviceMessage', this.OnDeviceMessage);
-    this.streamReceiver.off('video', this.onVideo);
-    this.streamReceiver.off('clientsStats', this.onClientsStats);
-    this.streamReceiver.off('displayInfo', this.onDisplayInfo);
-    this.streamReceiver.off('disconnected', () => {
+    console.log("DISCONNECTED DISCONNECTED", udid);
+    this.streamReceiver.off("deviceMessage", this.OnDeviceMessage);
+    this.streamReceiver.off("video", this.onVideo);
+    this.streamReceiver.off("clientsStats", this.onClientsStats);
+    this.streamReceiver.off("displayInfo", this.onDisplayInfo);
+    this.streamReceiver.off("disconnected", () => {
       this.onDisconnected(udid, eventEmitter);
     });
     const deviceSerialDiv = document.querySelector(`[data-streamid="${udid}"]`);
     console.log(deviceSerialDiv);
-    const [ip, port] = udid.split(':');
+    const [ip, port] = udid.split(":");
     const removeBtn = document.getElementById(`${udid}-removeBtn`);
-    const errorOverlay = deviceSerialDiv.querySelector('.error-overlay');
+    const errorOverlay = deviceSerialDiv.querySelector(".error-overlay");
     //@ts-ignore
-    errorOverlay.style.display = 'flex';
+    errorOverlay.style.display = "flex";
     setTimeout(() => {
       removeBtn.click();
-      eventEmitter.emit('recast', { ip });
+      eventEmitter.emit("recast", { ip });
     }, 4000);
 
     this.filePushHandler?.release();
@@ -365,8 +367,8 @@ export class StreamClientScrcpy
 
     this.fitToScreen = true;
     if (!player) {
-      if (typeof playerName !== 'string') {
-        throw Error('Must provide BasePlayer instance or playerName');
+      if (typeof playerName !== "string") {
+        throw Error("Must provide BasePlayer instance or playerName");
       }
       let displayInfo: DisplayInfo | undefined;
       if (this.streamReceiver && videoSettings) {
@@ -378,7 +380,7 @@ export class StreamClientScrcpy
       if (!p) {
         throw Error(`Unsupported player: "${playerName}"`);
       }
-      if (typeof fitToScreen !== 'boolean') {
+      if (typeof fitToScreen !== "boolean") {
         fitToScreen = StreamClientScrcpy.getFitToScreen(
           playerName,
           udid,
@@ -432,34 +434,34 @@ export class StreamClientScrcpy
     // videoSettings.bounds.width = 1730;
     // videoSettings.bounds.w = 1934;
 
-    const video = document.createElement('div');
-    video.className = 'video-element';
-    video.setAttribute('data-streamId', udid);
-    video.setAttribute('data-serial', serial);
-    video.setAttribute('data-deviceName', deviceName);
+    const video = document.createElement("div");
+    video.className = "video-element";
+    video.setAttribute("data-streamId", udid);
+    video.setAttribute("data-serial", serial);
+    video.setAttribute("data-deviceName", deviceName);
 
-    const povOverlay = document.createElement('div');
-    const povText = document.createElement('p');
-    const removeBtn = document.createElement('div');
-    const errorOverLay = document.createElement('div');
+    const povOverlay = document.createElement("div");
+    const povText = document.createElement("p");
+    const removeBtn = document.createElement("div");
+    const errorOverLay = document.createElement("div");
 
-    const errortext = document.createElement('div');
-    const reconnectingText = document.createElement('div');
-    const reconnectingDots = document.createElement('span');
+    const errortext = document.createElement("div");
+    const reconnectingText = document.createElement("div");
+    const reconnectingDots = document.createElement("span");
 
-    errorOverLay.className = 'error-overlay';
-    reconnectingDots.className = 'dots';
-    reconnectingText.className = 'reconnecting';
-    reconnectingText.innerHTML = 'Reconnecting';
+    errorOverLay.className = "error-overlay";
+    reconnectingDots.className = "dots";
+    reconnectingText.className = "reconnecting";
+    reconnectingText.innerHTML = "Reconnecting";
     reconnectingText.appendChild(reconnectingDots);
     errortext.appendChild(reconnectingText);
     errorOverLay.appendChild(errortext);
     removeBtn.id = `${udid}-removeBtn`;
-    removeBtn.className = 'removeBtn';
-    removeBtn.innerHTML = 'Remove';
-    povText.className = 'pov-text';
-    povText.innerHTML = 'View POV';
-    povOverlay.className = 'overlay';
+    removeBtn.className = "removeBtn";
+    removeBtn.innerHTML = "Remove";
+    povText.className = "pov-text";
+    povText.innerHTML = "View POV";
+    povOverlay.className = "overlay";
     povOverlay.appendChild(povText);
     video.appendChild(povOverlay);
     video.appendChild(errorOverLay);
@@ -469,7 +471,7 @@ export class StreamClientScrcpy
     player.setParent(video);
     player.pause();
 
-    const touchLayer = video.querySelector('.touch-layer');
+    const touchLayer = video.querySelector(".touch-layer");
 
     // Remove the touch layer if found
     if (touchLayer) {
@@ -480,17 +482,17 @@ export class StreamClientScrcpy
     // video.style.height = '100%';
 
     // const rootEl = document.getElementById('root');
-    const rootEl = document.getElementById('devices-panel');
-    const targetDiv = document.getElementById('device-view');
+    const rootEl = document.getElementById("devices-panel");
+    const targetDiv = document.getElementById("device-view");
 
-    const headerDeviceName = document.getElementById('device-name');
-    const headerDeviceSerial = document.getElementById('device-serial');
+    const headerDeviceName = document.getElementById("device-name");
+    const headerDeviceSerial = document.getElementById("device-serial");
     const panelDiv = this.createPanelDiv(deviceName, serial);
-    povText.addEventListener('click', (e) => {
+    povText.addEventListener("click", (e) => {
       e.stopPropagation();
-//@ts-ignore
-      if (e.target.parentElement.parentElement.id !== 'device-view') {
-        const deviceView = document.getElementById('device-view');
+      //@ts-ignore
+      if (e.target.parentElement.parentElement.id !== "device-view") {
+        const deviceView = document.getElementById("device-view");
         const currentDetailsDiv = document.getElementById(serial);
         if (currentDetailsDiv) {
           currentDetailsDiv.remove();
@@ -499,9 +501,9 @@ export class StreamClientScrcpy
         if (deviceView.children.length) {
           for (let i = 0; i < deviceView.children.length; i++) {
             const childNode = deviceView.children[i]; // Get child node by index
-            if (childNode.hasAttribute('data-serial')) {
-              const serialNum = childNode.getAttribute('data-serial');
-              const deviceName = childNode.getAttribute('data-deviceName');
+            if (childNode.hasAttribute("data-serial")) {
+              const serialNum = childNode.getAttribute("data-serial");
+              const deviceName = childNode.getAttribute("data-deviceName");
               currentPanelDiv = this.createPanelDiv(deviceName, serialNum);
             }
             rootEl.appendChild(childNode);
@@ -512,7 +514,7 @@ export class StreamClientScrcpy
         }
         headerDeviceName.innerHTML = deviceName;
         headerDeviceSerial.innerHTML = serial;
-        deviceView.innerHTML = '';
+        deviceView.innerHTML = "";
         deviceView.appendChild(video);
       }
     });
@@ -529,7 +531,7 @@ export class StreamClientScrcpy
     removeBtn.style.height = 0;
     //@ts-ignore
     removeBtn.style.width = 0;
-    removeBtn.addEventListener('click', (e) => {
+    removeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       video.remove();
       panelDiv.remove();
@@ -564,50 +566,50 @@ export class StreamClientScrcpy
     // this.filePushHandler.addEventListener(logger);
 
     const streamReceiver = this.streamReceiver;
-    streamReceiver.on('deviceMessage', this.OnDeviceMessage);
-    streamReceiver.on('video', this.onVideo);
-    streamReceiver.on('clientsStats', this.onClientsStats);
-    streamReceiver.on('displayInfo', this.onDisplayInfo);
-    streamReceiver.on('disconnected', () => {
+    streamReceiver.on("deviceMessage", this.OnDeviceMessage);
+    streamReceiver.on("video", this.onVideo);
+    streamReceiver.on("clientsStats", this.onClientsStats);
+    streamReceiver.on("displayInfo", this.onDisplayInfo);
+    streamReceiver.on("disconnected", () => {
       this.onDisconnected(udid, eventEmitter);
     });
     console.log(TAG, player.getName(), udid);
   }
 
   public createPanelDiv(deviceName, serial) {
-    const panelDiv = document.createElement('div');
+    const panelDiv = document.createElement("div");
     panelDiv.id = serial;
     panelDiv.className = `cast-panel w-full`;
     const initials = deviceName
-      .split(' ')
+      .split(" ")
       .map((i) => i[0].toUpperCase())
-      .join('');
-    const detailsDiv = document.createElement('div');
-    detailsDiv.className = 'cast-details w-full flex gap-2';
-    const profileImg = document.createElement('div');
+      .join("");
+    const detailsDiv = document.createElement("div");
+    detailsDiv.className = "cast-details w-full flex gap-2";
+    const profileImg = document.createElement("div");
     profileImg.className =
-      'vr-profile flex items-center justify-center w-20 h-20 bg-gray-300 rounded-full';
-    const initialsSpan = document.createElement('span');
-    initialsSpan.className = 'text-4xl font-bold text-gray-700';
+      "vr-profile flex items-center justify-center w-20 h-20 bg-gray-300 rounded-full";
+    const initialsSpan = document.createElement("span");
+    initialsSpan.className = "text-4xl font-bold text-gray-700";
     initialsSpan.textContent = initials;
 
     // Append the initials span to the profile image div
     profileImg.appendChild(initialsSpan);
-    const mainDetailDiv = document.createElement('div');
-    mainDetailDiv.className = 'main-details-div flex flex-col w-full';
-    const nameDetails = document.createElement('div');
-    nameDetails.className = 'name-details flex gap-2 items-center';
-    const devicename = document.createElement('p');
+    const mainDetailDiv = document.createElement("div");
+    mainDetailDiv.className = "main-details-div flex flex-col w-full";
+    const nameDetails = document.createElement("div");
+    nameDetails.className = "name-details flex gap-2 items-center";
+    const devicename = document.createElement("p");
     devicename.innerHTML = deviceName;
-    devicename.className = 'font-bold text-sm';
+    devicename.className = "font-bold text-sm";
     nameDetails.appendChild(devicename);
-    const watching = document.createElement('p');
-    watching.innerHTML = 'Watching ';
-    watching.className = 'text-emerald-700 italic watching-text text-xs';
+    const watching = document.createElement("p");
+    watching.innerHTML = "Watching ";
+    watching.className = "text-emerald-700 italic watching-text text-xs";
     nameDetails.appendChild(watching);
-    const serialDetailsDiv = document.createElement('p');
+    const serialDetailsDiv = document.createElement("p");
     serialDetailsDiv.innerHTML = `VR S.No - ${serial}`;
-    serialDetailsDiv.className = 'text-sm';
+    serialDetailsDiv.className = "text-sm";
 
     mainDetailDiv.appendChild(nameDetails);
     mainDetailDiv.appendChild(serialDetailsDiv);
@@ -720,7 +722,7 @@ export class StreamClientScrcpy
 
   private static onConfigureStreamClick = (event: MouseEvent): void => {
     const button = event.currentTarget as HTMLAnchorElement;
-    const udid = Util.parseStringEnv(button.getAttribute(Attribute.UDID) || '');
+    const udid = Util.parseStringEnv(button.getAttribute(Attribute.UDID) || "");
     const fullName = button.getAttribute(Attribute.FULL_NAME);
     const secure =
       Util.parseBooleanEnv(
@@ -729,7 +731,7 @@ export class StreamClientScrcpy
     const hostname =
       Util.parseStringEnv(
         button.getAttribute(Attribute.HOSTNAME) || undefined
-      ) || '';
+      ) || "";
     const port = Util.parseIntEnv(
       button.getAttribute(Attribute.PORT) || undefined
     );
@@ -739,11 +741,11 @@ export class StreamClientScrcpy
     if (!udid) {
       throw Error(`Invalid udid value: "${udid}"`);
     }
-    if (typeof port !== 'number') {
+    if (typeof port !== "number") {
       throw Error(`Invalid port type: ${typeof port}`);
     }
     const tracker = DeviceTracker.getInstance({
-      type: 'android',
+      type: "android",
       secure,
       hostname,
       port,
@@ -770,7 +772,7 @@ export class StreamClientScrcpy
     const options: ParamsStreamScrcpy = {
       udid,
       ws,
-      player: '',
+      player: "",
       action: ACTION.STREAM_SCRCPY,
       secure,
       hostname,
@@ -778,14 +780,14 @@ export class StreamClientScrcpy
       useProxy,
     };
     const dialog = new ConfigureScrcpy(tracker, descriptor, options);
-    dialog.on('closed', StreamClientScrcpy.onConfigureDialogClosed);
+    dialog.on("closed", StreamClientScrcpy.onConfigureDialogClosed);
   };
 
   private static onConfigureDialogClosed = (event: {
     dialog: ConfigureScrcpy;
     result: boolean;
   }): void => {
-    event.dialog.off('closed', StreamClientScrcpy.onConfigureDialogClosed);
+    event.dialog.off("closed", StreamClientScrcpy.onConfigureDialogClosed);
     if (event.result) {
       HostTracker.getInstance().destroy();
     }

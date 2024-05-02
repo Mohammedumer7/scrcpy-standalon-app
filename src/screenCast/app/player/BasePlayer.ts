@@ -1,3 +1,4 @@
+//@ts-nocheck
 import VideoSettings from '../VideoSettings';
 import ScreenInfo from '../ScreenInfo';
 import Rect from '../Rect';

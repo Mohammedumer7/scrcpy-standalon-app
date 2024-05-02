@@ -1,3 +1,4 @@
+//@ts-nocheck
 import 'xterm/css/xterm.css';
 import { ManagerClient } from '../../client/ManagerClient';
 import { Terminal } from 'xterm';

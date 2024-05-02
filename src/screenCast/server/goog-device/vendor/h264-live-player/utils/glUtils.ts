@@ -1,4 +1,4 @@
-// @ts-ignore
+//@ts-nocheck
 import { Matrix, Vector } from 'sylvester.js';
 
 const $M = Matrix.create;

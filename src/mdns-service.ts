@@ -1,35 +1,46 @@
 //@ts-nocheck
-import Electron, { ipcMain } from 'electron';
-import log from 'electron-log/main';
+import Electron, { ipcMain } from "electron";
+import log from "electron-log/main";
 
-import DeviceDiscovery from 'multicast-device-discovery';
-import { startAdbServer, checkConnectedDevices, connect, getListOfConnectedDevices, authorizeDevice, tcpIpConnect, client } from './library/adb';
-import { cast } from './screenCast/app';
+import DeviceDiscovery from "multicast-device-discovery";
+import {
+  startAdbServer,
+  checkConnectedDevices,
+  connect,
+  getListOfConnectedDevices,
+  authorizeDevice,
+  tcpIpConnect,
+  client,
+} from "./library/adb";
+import { cast } from "./screenCast/app";
 class ActionAvailableDevicesToCast {
-  private mainwindow:any
+  private mainwindow: any;
+  private adbConnectedDevices: any;
   private extractdeviceData(device: any) {
     const ip = device.referer.address;
-    const id = device.name.split('-')[1];
-    const checkForwarded = device.name.split(' ');
+    const id = device.name.split("-")[1];
+    const checkForwarded = device.name.split(" ");
     const forwardedDeviceName = checkForwarded[0];
-    const name = device.name.split('-')[0];
+    const name = device.name.split("-")[0];
     const port = device.port;
     return { ip, id, checkForwarded, forwardedDeviceName, name, port };
   }
-  constructor(window:any){
-    this.mainwindow = window
-    this.setup()
+  constructor(window: any) {
+    this.mainwindow = window;
+    this.adbConnectedDevices = {};
+    this.currentlyStreamingDevices = {};
+    this.setup();
   }
   private async fetchAvailableDevicesToCast() {
-    this.deviceDiscovery.on('Update', (devices: any) => {
-      log.info('Received device update event:', devices);
+    this.deviceDiscovery.on("Update", (devices: any) => {
+      log.info("Received device update event:", devices);
       const connectedDevices: any[] = [];
       const readyToCast: any[] = [];
       try {
         devices?.devices.forEach((device: any) => {
           const { ip, id, checkForwarded, forwardedDeviceName, name, port } =
             this.extractdeviceData(device);
-
+          console.log(this.adbConnectedDevices, forwardedDeviceName);
           if (checkForwarded.length > 1) {
             this.adbConnectedDevices[forwardedDeviceName] = device;
           }
@@ -38,19 +49,20 @@ class ActionAvailableDevicesToCast {
           );
         });
 
-        this.adbConnectedDevices && Object.keys(this.adbConnectedDevices)?.forEach((key) => {
-          const { ip, id, forwardedDeviceName, name, port } =
-            this.extractdeviceData(this.adbConnectedDevices[key]);
-          connectedDevices.push(
-            connect({ ip, name, port, id, forwardedDeviceName })
-          );
-        });
-        console.log('connected devices', connectedDevices);
+        this.adbConnectedDevices &&
+          Object.keys(this.adbConnectedDevices)?.forEach((key) => {
+            const { ip, id, forwardedDeviceName, name, port } =
+              this.extractdeviceData(this.adbConnectedDevices[key]);
+            connectedDevices.push(
+              connect({ ip, name, port, id, forwardedDeviceName })
+            );
+          });
+        console.log("connected devices", connectedDevices);
         Promise.allSettled(connectedDevices)
           .then((results) => {
-            log.info('Connected devices:', results);
+            log.info("Connected devices:", results);
             results.forEach((result) => {
-              if (result.status === 'fulfilled') {
+              if (result.status === "fulfilled") {
                 const { ip, port, forwardedDeviceName } = result.value.data;
                 if (ip && port) {
                   const deviceIdx = devices.devices.findIndex(
@@ -62,7 +74,7 @@ class ActionAvailableDevicesToCast {
                   if (readyToCastIdx === -1) {
                     if (deviceIdx !== -1) {
                       devices.devices[deviceIdx].name =
-                        devices.devices[deviceIdx].name.split(' ')[0];
+                        devices.devices[deviceIdx].name.split(" ")[0];
                       const deviceData = devices.devices[deviceIdx];
                       readyToCast.push(deviceData);
                     } else if (this.adbConnectedDevices[forwardedDeviceName]) {
@@ -71,7 +83,6 @@ class ActionAvailableDevicesToCast {
                       );
                     }
                   }
-
                 }
               }
             });
@@ -80,45 +91,48 @@ class ActionAvailableDevicesToCast {
               const ip = device.referer.address;
               this.currentlyStreamingDevices[ip] = device;
             });
-            console.log("readyToCast",readyToCast)
-            if(readyToCast.length > 0) {
-                const {port} = readyToCast[0]
-                const ip = readyToCast[0].referer.address
-                this.mainwindow.webContents.send("cast",{ip,
-                  port,
-                  deviceName:"deviceName",
-                  serial:"serial",
-                  eventEmitter:"sddf"})
-                // cast(ip,
-                //     port,
-                //     "deviceName",
-                //     "serial",
-                //     "sddf")
+            console.log("readyToCast", readyToCast);
+            if (readyToCast.length > 0) {
+              const { port } = readyToCast[0];
+              const ip = readyToCast[0].referer.address;
+              // cast(ip, port, "asdsaa", "adasad", "adssad");
+              this.mainwindow.webContents.send("cast", {
+                ip,
+                port,
+                deviceName: "deviceName",
+                serial: "serial",
+                eventEmitter: "sddf",
+              });
+              // cast(ip,
+              //     port,
+              //     "deviceName",
+              //     "serial",
+              //     "sddf")
             }
-            console.log(readyToCast)
+            console.log(readyToCast);
           })
           .catch((error) => {
-            log.error('Error connecting to devices:', error);
-            console.log('Error connecting to devices:', error);
+            log.error("Error connecting to devices:", error);
+            console.log("Error connecting to devices:", error);
           });
       } catch (error) {
-        console.log("Error while device connection",error)
+        console.log("Error while device connection", error);
       }
 
       return null;
     });
 
-    this.deviceDiscovery.on('Device Discovery Error', (error: any) => {
-        console.log("Error in Device Discovery", error);
+    this.deviceDiscovery.on("Device Discovery Error", (error: any) => {
+      console.log("Error in Device Discovery", error);
     });
     this.deviceDiscovery.startDeviceDiscovery();
   }
 
-  setupDeviceDiscovery( ) {
+  setupDeviceDiscovery() {
     if (!this.deviceDiscovery && !this.initialised) {
       const options = {
         deviceTimeoutThreshold: 3000,
-        serviceType: 'adb-tls-connect',
+        serviceType: "adb-tls-connect",
       };
       this.deviceDiscovery = new DeviceDiscovery(options);
     }
@@ -126,7 +140,7 @@ class ActionAvailableDevicesToCast {
     this.initialised = true;
   }
   async startStreaming(args: any) {
-    log.info('Starting streaming:', args);
+    log.info("Starting streaming:", args);
     try {
       const { ip, name, port, id, forwardedDeviceName } = args;
       await connect({

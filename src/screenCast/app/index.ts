@@ -1,6 +1,6 @@
-import { StreamClientScrcpy } from './googDevice/client/StreamClientScrcpy';
-import { HostTracker } from './client/HostTracker';
-import { Tool } from './client/Tool';
+import { StreamClientScrcpy } from "./googDevice/client/StreamClientScrcpy";
+import { HostTracker } from "./client/HostTracker";
+import { Tool } from "./client/Tool";
 
 // export class startCasting {
 //   private ip: string;
@@ -18,10 +18,10 @@ export async function cast(
 ) {
   console.log({ ip, port, deviceName, serial, eventEmitter });
   const queryHash = `#!action=stream&udid=${ip}%3A${port}&player=webcodecs&ws=ws%3A%2F%2Flocalhost%3A8000%2F%3Faction%3Dproxy-adb%26remote%3Dtcp%253A8886%26udid%3D${ip}%253A${port}`;
-  console.log(queryHash)
-  const hash = queryHash.replace(/^#!/, '');
+  console.log(queryHash);
+  const hash = queryHash.replace(/^#!/, "");
   const parsedQuery = new URLSearchParams(hash);
-  const action = parsedQuery.get('action');
+  const action = parsedQuery.get("action");
   //@ts-ignore
   parsedQuery.deviceName = deviceName;
   //@ts-ignore
@@ -35,7 +35,7 @@ export async function cast(
   /// #endif
 
   /// #if USE_H264_CONVERTER
-  const { MsePlayer } = await import('./player/MsePlayer');
+  const { MsePlayer } = await import("./player/MsePlayer");
   StreamClientScrcpy.registerPlayer(MsePlayer);
   /// #endif
 
@@ -45,13 +45,13 @@ export async function cast(
   /// #endif
 
   /// #if USE_WEBCODECS
-  const { WebCodecsPlayer } = await import('./player/WebCodecsPlayer');
+  const { WebCodecsPlayer } = await import("./player/WebCodecsPlayer");
   StreamClientScrcpy.registerPlayer(WebCodecsPlayer);
   /// #endif
 
   if (
     action === StreamClientScrcpy.ACTION &&
-    typeof parsedQuery.get('udid') === 'string'
+    typeof parsedQuery.get("udid") === "string"
   ) {
     StreamClientScrcpy.start(parsedQuery);
     return;

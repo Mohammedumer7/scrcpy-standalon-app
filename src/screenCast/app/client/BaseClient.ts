@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { TypedEmitter } from '../../common/TypedEmitter';
 import { ParamsBase } from '../../types/ParamsBase';
 import Util from '../Util';

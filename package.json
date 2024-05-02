@@ -48,6 +48,7 @@
     "systeminformation": "^5.22.7",
     "tslib": "^2.6.2",
     "uuid": "^9.0.1",
+    "websocket": "^1.0.34",
     "ws": "^8.17.0",
     "yaml": "^2.4.0"
   },
