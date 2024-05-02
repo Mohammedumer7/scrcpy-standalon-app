@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FilePushResponseStatus = void 0;
+var FilePushResponseStatus;
+(function (FilePushResponseStatus) {
+    FilePushResponseStatus[FilePushResponseStatus["NEW_PUSH_ID"] = 1] = "NEW_PUSH_ID";
+    FilePushResponseStatus[FilePushResponseStatus["NO_ERROR"] = 0] = "NO_ERROR";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_INVALID_NAME"] = -1] = "ERROR_INVALID_NAME";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_NO_SPACE"] = -2] = "ERROR_NO_SPACE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_FAILED_TO_DELETE"] = -3] = "ERROR_FAILED_TO_DELETE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_FAILED_TO_CREATE"] = -4] = "ERROR_FAILED_TO_CREATE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_FILE_NOT_FOUND"] = -5] = "ERROR_FILE_NOT_FOUND";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_FAILED_TO_WRITE"] = -6] = "ERROR_FAILED_TO_WRITE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_FILE_IS_BUSY"] = -7] = "ERROR_FILE_IS_BUSY";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_INVALID_STATE"] = -8] = "ERROR_INVALID_STATE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_UNKNOWN_ID"] = -9] = "ERROR_UNKNOWN_ID";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_NO_FREE_ID"] = -10] = "ERROR_NO_FREE_ID";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_INCORRECT_SIZE"] = -11] = "ERROR_INCORRECT_SIZE";
+    FilePushResponseStatus[FilePushResponseStatus["ERROR_OTHER"] = -12] = "ERROR_OTHER";
+})(FilePushResponseStatus = exports.FilePushResponseStatus || (exports.FilePushResponseStatus = {}));
